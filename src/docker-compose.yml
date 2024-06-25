@@ -3,12 +3,27 @@ networks:
     driver: bridge
 
 services:
+  db:
+    image: postgres:15
+    container_name: dbPostgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
+
   financialchat.api.web:
     image: financialchatwebapi
     container_name: financialchat.api.web
     build:
       context: .
       dockerfile: ./FinancialChat.API/Dockerfile
+    depends_on:
+      - db
     ports:
       - "5100:8080"
     networks:
@@ -44,4 +59,5 @@ services:
       - mynetwork
 
 volumes:
-  dbdata6:
+  db:
+    driver: local

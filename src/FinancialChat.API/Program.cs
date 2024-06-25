@@ -1,5 +1,8 @@
 using FinancialChat.API.Controllers;
+using FinancialChat.Infra.Context;
 using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -10,7 +13,40 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Financial Chat API",
+        Version = "v1",
+        Description = "Financial Chat API",
+    });
+
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
 
 builder.Services.AddSignalR();
 
@@ -23,17 +59,16 @@ builder.Services.AddHttpLogging(logging => {
     logging.ResponseBodyLogLimit = 4096;
 });
 
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "Financial Chat API",
-        Version = "v1",
-        Description = "Financial Chat API",
-    });
-});
-
 builder.Services.AddCors();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<FinancialChatContext>(options =>
+    options.UseNpgsql(connectionString));
+
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+    .AddEntityFrameworkStores<FinancialChatContext>();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -65,6 +100,8 @@ app.UseCors(options =>
     .AllowCredentials()
     .SetIsOriginAllowed(origin => true);
 });
+
+app.MapIdentityApi<IdentityUser>();
 
 app.UseHttpsRedirection();
 

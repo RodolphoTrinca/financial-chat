@@ -10,6 +10,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["FinancialChat.API/FinancialChat.API.csproj", "FinancialChat.API/"]
+COPY ["FinancialChat.Infra/FinancialChat.Infra.csproj", "FinancialChat.Infra/"]
 RUN dotnet restore "./FinancialChat.API/FinancialChat.API.csproj"
 COPY . .
 WORKDIR "/src/FinancialChat.API"
