@@ -1,5 +1,10 @@
 using FinancialChat.API.Controllers;
+using FinancialChat.Application.Interfaces.Gateways;
+using FinancialChat.Application.Interfaces.Services;
+using FinancialChat.Application.Services;
 using FinancialChat.Infra.Context;
+using FinancialChat.Infra.RabbitMQ.Configuration;
+using FinancialChat.Infra.RabbitMQ.Producers;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -48,8 +53,10 @@ builder.Services.AddSwaggerGen(opt =>
     });
 });
 
+//Adding SignalR 
 builder.Services.AddSignalR();
 
+//Serilog configuration
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
@@ -61,6 +68,13 @@ builder.Services.AddHttpLogging(logging => {
 
 builder.Services.AddCors();
 
+//Rabbit MQ Configuration
+builder.Services.Configure<RabbitMQConfiguration>(builder.Configuration.GetSection("RabbitMQConnectionSettings"));
+builder.Services.Configure<RabbitMQQueueNames>(builder.Configuration.GetSection("RabbitMQQueueNames"));
+builder.Services.AddScoped<IRabbitMQConnectionFactory, RabbitMQConnectionFactory>();
+builder.Services.AddScoped<IStockRequestProducer, StockRequestProducer>();
+
+//Identity configurations
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<FinancialChatContext>(options =>
@@ -69,6 +83,9 @@ builder.Services.AddDbContext<FinancialChatContext>(options =>
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
     .AddEntityFrameworkStores<FinancialChatContext>();
 builder.Services.AddAuthorization();
+
+//Configuring Services
+builder.Services.AddScoped<IStockService, StockService>();
 
 var app = builder.Build();
 

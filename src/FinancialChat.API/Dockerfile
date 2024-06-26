@@ -11,6 +11,7 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["FinancialChat.API/FinancialChat.API.csproj", "FinancialChat.API/"]
 COPY ["FinancialChat.Infra/FinancialChat.Infra.csproj", "FinancialChat.Infra/"]
+COPY ["FinancialChat.Application/FinancialChat.Application.csproj", "FinancialChat.Application/"]
 RUN dotnet restore "./FinancialChat.API/FinancialChat.API.csproj"
 COPY . .
 WORKDIR "/src/FinancialChat.API"
