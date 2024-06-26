@@ -1,56 +1,26 @@
 import './App.css';
-import React, {useState, useEffect} from "react";
-import { LogLevel, HubConnectionBuilder } from '@microsoft/signalr';
-
-const connection = new HubConnectionBuilder()
-      .withUrl("http://localhost:5071/api/chatHub")
-      .configureLogging(LogLevel.Debug)
-      .build();
+import React from "react";
+import Root from "./Routes/Root";
+import { AuthProvider } from './Hooks/Login/useAuth';
+import Login from "./Components/Login/Login";
+import { Routes, Route } from "react-router-dom";
+import Chat from "./Components/Chat";
+import {ProtectedRoute} from "./Routes/ProtectedRoute";
 
 function App() {
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    connection.start()
-      .then(() => console.log('Connected to SignalR hub'))
-      .catch(err => console.error('Error connecting to hub:', err));  
-
-    connection.on('ReceiveMessage', data => {
-      console.log('Received message:', data);
-      setMessage(data);
-    });
-  }, []);
-
-  const onClick = (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(event.target);
-    const entries = formData.entries();
-
-    console.log(formData);
-
-    const user = "usuario 1";
-    const message = "Mensagem teste";
-
-    connection.invoke("SendMessage", user, message)
-      .then(() => console.log('Message sent'))
-      .catch(err => console.error('Error sending message to hub:', err));
-  }
-
   return (
-    <>
-      <h1>Chat channel</h1>
-      <form onSubmit={onClick}>
-        <label>User
-          <input type="text" name="user"></input>
-        </label>
-        <label>Message
-        <input type="text" name="message"></input>
-        </label>
-        <button type="submit">Enviar</button>
-      </form>
-      {message}
-    </>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Root/>}> 
+          <Route path="/chat" element={
+            <ProtectedRoute>
+              <Chat/>
+            </ProtectedRoute>
+          }/>
+        </Route>
+        <Route path="/login" element={<Login />} /> 
+      </Routes>
+    </AuthProvider>
   );
 }
 
