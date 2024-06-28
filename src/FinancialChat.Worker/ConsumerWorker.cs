@@ -5,9 +5,9 @@ namespace FinancialChat.Worker
     public class ConsumerWorker : BackgroundService
     {
         private readonly ILogger<ConsumerWorker> _logger;
-        private readonly IStockRequestConsumer _consumer;
+        private readonly IRabbitMQConsumer _consumer;
 
-        public ConsumerWorker(ILogger<ConsumerWorker> logger, IStockRequestConsumer stockRequestConsumer)
+        public ConsumerWorker(ILogger<ConsumerWorker> logger, IRabbitMQConsumer stockRequestConsumer)
         {
             _logger = logger;
             _consumer = stockRequestConsumer;

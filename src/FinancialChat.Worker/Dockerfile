@@ -8,6 +8,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["FinancialChat.Worker/FinancialChat.Worker.csproj", "FinancialChat.Worker/"]
+COPY ["FinancialChat.Infra/FinancialChat.Infra.csproj", "FinancialChat.Infra/"]
+COPY ["FinancialChat.Application/FinancialChat.Application.csproj", "FinancialChat.Application/"]
 RUN dotnet restore "./FinancialChat.Worker/FinancialChat.Worker.csproj"
 COPY . .
 WORKDIR "/src/FinancialChat.Worker"
