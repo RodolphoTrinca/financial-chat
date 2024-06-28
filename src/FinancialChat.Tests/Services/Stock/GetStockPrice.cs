@@ -15,7 +15,7 @@ namespace FinancialChat.Tests.Services.Stock
                 .GetStockPrice(Arg.Is<StockMessageModel>(st => st.StockTicker.Equals(stockTicker)))
                 .Returns(true);
 
-            var result = _service.GetStockPrice(stockTicker);
+            var result = _service.SendMessageWithStockPrice(stockTicker);
 
             Assert.True(result);
         }

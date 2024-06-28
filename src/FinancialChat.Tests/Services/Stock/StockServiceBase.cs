@@ -7,13 +7,13 @@ namespace FinancialChat.Tests.Services.Stock
 {
     public class StockServiceBase
     {
-        protected ILogger<StockService> _logger;
+        protected ILogger<ChatCommandService> _logger;
         protected IStockRequestProducer _stockRequest;
-        protected StockService _service;
+        protected ChatCommandService _service;
 
         public StockServiceBase()
         {
-            _logger = Substitute.For<ILogger<StockService>>();
+            _logger = Substitute.For<ILogger<ChatCommandService>>();
             _stockRequest = Substitute.For<IStockRequestProducer>();
 
             _service = new StockService(_logger, _stockRequest);
