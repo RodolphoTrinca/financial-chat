@@ -9,8 +9,8 @@ namespace FinancialChat.Application.Interfaces.Services
 {
     public interface IChatService
     {
-        void SendMessage(MessagesData message);
+        void SaveMessage(MessagesData message);
 
-        IEnumerable<MessagesData> GetChatMessage(string from, string to);
+        IEnumerable<MessagesData> GetChatRoomMessages(string chatroom);
     }
 }

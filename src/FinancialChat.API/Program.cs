@@ -1,6 +1,7 @@
 using FinancialChat.API.Controllers;
 using FinancialChat.Application.Entities.Configuration.RabbitMQ;
 using FinancialChat.Application.Interfaces.Gateways;
+using FinancialChat.Application.Interfaces.Repositorys;
 using FinancialChat.Application.Interfaces.Services;
 using FinancialChat.Application.Services;
 using FinancialChat.Application.SignalR;
@@ -8,6 +9,7 @@ using FinancialChat.Infra.Context;
 using FinancialChat.Infra.RabbitMQ.Configuration;
 using FinancialChat.Infra.RabbitMQ.Consumers;
 using FinancialChat.Infra.RabbitMQ.Producers;
+using FinancialChat.Infra.Repository;
 using FinancialChat.Worker;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
@@ -58,7 +60,10 @@ builder.Services.AddSwaggerGen(opt =>
 });
 
 //Adding SignalR 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.DisableImplicitFromServicesParameters = true;
+});
 
 //Serilog configuration
 builder.Host.UseSerilog((context, configuration) =>
@@ -78,9 +83,14 @@ builder.Services.Configure<RabbitMQQueueNames>(builder.Configuration.GetSection(
 builder.Services.AddSingleton<IRabbitMQConnectionFactory, RabbitMQConnectionFactory>();
 builder.Services.AddSingleton<IRabbitMQConsumer, HubConnectionMessageConsumer>();
 builder.Services.AddScoped<IStockRequestProducer, StockRequestProducer>();
+builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IMessagesRepository, MessagesRepository>();
 
 //Identity configurations
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+builder.Services.AddDbContext<MessagesDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddDbContext<FinancialChatContext>(options =>
     options.UseNpgsql(connectionString));
@@ -124,7 +134,7 @@ app.UseCors(options =>
     .SetIsOriginAllowed(origin => true);
 });
 
-app.MapIdentityApi<IdentityUser>();
+app.MapGroup("/api").MapIdentityApi<IdentityUser>();
 
 app.UseHttpsRedirection();
 

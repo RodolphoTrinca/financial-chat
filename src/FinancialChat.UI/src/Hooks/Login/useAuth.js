@@ -5,7 +5,7 @@ const AuthContext = createContext({});
 
 const getUserData = async (setUser, navigate) => {
   try {
-    const response = await fetch("http://localhost:5071/manage/info", {
+    const response = await fetch("http://localhost:5071/api/manage/info", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
   const loginAction = async (data) => {
     try {
-      const response = await fetch("http://localhost:5071/login", {
+      const response = await fetch("http://localhost:5071/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

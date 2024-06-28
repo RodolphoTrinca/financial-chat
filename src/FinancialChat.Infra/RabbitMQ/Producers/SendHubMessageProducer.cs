@@ -11,7 +11,7 @@ using System.Text;
 
 namespace FinancialChat.Infra.RabbitMQ.Producers
 {
-    public class SendHubMessageProducer : ISendHubMessageProducer
+    public class SendHubMessageProducer : ISendHubMessageProducer, IDisposable
     {
         private readonly RabbitMQConfiguration _configuration;
         private readonly ILogger<StockRequestProducer> _logger;

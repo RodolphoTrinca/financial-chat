@@ -16,12 +16,12 @@ namespace FinancialChat.Application.Services
             _repository = messagesRepository;
         }
 
-        public IEnumerable<MessagesData> GetChatMessage(string from, string to)
+        public IEnumerable<MessagesData> GetChatRoomMessages(string chatRoom)
         {
-            return _repository.GetChatMessages(from, to);
+            return _repository.GetChatRoomMessages(chatRoom);
         }
 
-        public void SendMessage(MessagesData message)
+        public void SaveMessage(MessagesData message)
         {
             _repository.Add(message);
         }

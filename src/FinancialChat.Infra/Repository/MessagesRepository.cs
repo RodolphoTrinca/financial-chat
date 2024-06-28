@@ -24,13 +24,14 @@ namespace FinancialChat.Infra.Repository
             _context.SaveChanges();
         }
 
-        public IEnumerable<MessagesData> GetChatMessages(string from, string to)
+        public IEnumerable<MessagesData> GetChatRoomMessages(string chatRoom)
         {
-            _logger.LogDebug($"Retriving messages from user: {from} to: {to}");
+            _logger.LogDebug($"Retriving messages from chat room: {chatRoom}");
             return _context.Messages
-                .Where(m => m.From == from && m.To == to)
+                .Where(m => m.To == chatRoom)
                 .OrderByDescending(m => m.Created)
-                .Take(50);
+                .Take(50)
+                .ToList();
         }
     }
 }

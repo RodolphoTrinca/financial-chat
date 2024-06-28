@@ -1,17 +1,29 @@
-const REGISTER_URL = "/register";
-import { useAxiosFunction } from '../Axios/useAxiosFunction';
+import { useNavigate } from "react-router-dom";
 
 export const useRegister = () => {
-    const [response, error, loading, fetch] = useAxiosFunction();
+  const navigate = useNavigate();
 
-    const postData = (data) => {
-        fetch({
-            axiosInstance: axios,
-            method: 'POST',
-            url: REGISTER_URL,
-            data: data
-        })
-    };
+  const registerAction = async (data) => {
+    try {
+      const response = await fetch("http://localhost:5071/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    return [response, error, loading, postData];
-}
+      if (response.ok) {
+        console.log("register successful");
+        navigate("/login");
+        return;
+      }
+      throw new Error(response.message);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return [registerAction];
+};
+
