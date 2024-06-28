@@ -25,9 +25,14 @@ const getUserData = async (setUser, navigate) => {
   }
 };
 
+const refreshToken = async () => {
+
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("site") || "");
+  const [refreshToken, setRefreshToken] = useState();
   const navigate = useNavigate();
 
   const loginAction = async (data) => {
@@ -43,6 +48,7 @@ export const AuthProvider = ({ children }) => {
       if (res) {
         console.log("login successful")
         setToken(res.accessToken);
+        setRefreshToken(res.refreshToken);
         localStorage.setItem("site", res.accessToken);
         await getUserData(setUser, navigate);
         return;
@@ -56,6 +62,7 @@ export const AuthProvider = ({ children }) => {
   const logOut = () => {
     setUser(null);
     setToken("");
+    setRefreshToken("");
     localStorage.removeItem("site");
     navigate("/login");
   };

@@ -4,7 +4,7 @@ import Root from "./Routes/Root";
 import { AuthProvider } from './Hooks/Login/useAuth';
 import Login from "./Components/Login/Login";
 import { Routes, Route } from "react-router-dom";
-import Chat from "./Components/Chat";
+import Chat from "./Components/Chat/Chat";
 import {ProtectedRoute} from "./Routes/ProtectedRoute";
 
 function App() {
