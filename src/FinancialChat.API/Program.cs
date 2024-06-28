@@ -3,6 +3,7 @@ using FinancialChat.Application.Entities.Configuration.RabbitMQ;
 using FinancialChat.Application.Interfaces.Gateways;
 using FinancialChat.Application.Interfaces.Services;
 using FinancialChat.Application.Services;
+using FinancialChat.Application.SignalR;
 using FinancialChat.Infra.Context;
 using FinancialChat.Infra.RabbitMQ.Configuration;
 using FinancialChat.Infra.RabbitMQ.Consumers;
@@ -74,9 +75,9 @@ builder.Services.AddCors();
 //Rabbit MQ Configuration
 builder.Services.Configure<RabbitMQConfiguration>(builder.Configuration.GetSection("RabbitMQConnectionSettings"));
 builder.Services.Configure<RabbitMQQueueNames>(builder.Configuration.GetSection("RabbitMQQueueNames"));
-builder.Services.AddScoped<IRabbitMQConnectionFactory, RabbitMQConnectionFactory>();
-builder.Services.AddScoped<IStockRequestProducer, StockRequestProducer>();
+builder.Services.AddSingleton<IRabbitMQConnectionFactory, RabbitMQConnectionFactory>();
 builder.Services.AddSingleton<IRabbitMQConsumer, HubConnectionMessageConsumer>();
+builder.Services.AddScoped<IStockRequestProducer, StockRequestProducer>();
 
 //Identity configurations
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

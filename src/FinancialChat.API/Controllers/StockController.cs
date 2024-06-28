@@ -1,5 +1,6 @@
 using FinancialChat.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialChat.API.Controllers
@@ -11,11 +12,13 @@ namespace FinancialChat.API.Controllers
     {
         private readonly ILogger<StockController> _logger;
         private readonly IChatCommandService _service;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public StockController(ILogger<StockController> logger, IChatCommandService service)
+        public StockController(ILogger<StockController> logger, IChatCommandService service, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
             _service = service;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -25,9 +28,10 @@ namespace FinancialChat.API.Controllers
         {
             try
             {
+                var user = User.Identity.Name;
                 _logger.LogInformation($"Request to stock price from {stockTicker}");
 
-                var result = _service.SendMessageWithStockPrice(stockTicker);
+                var result = _service.SendMessageWithStockPrice(stockTicker, user);
 
                 if (!result)
                 {

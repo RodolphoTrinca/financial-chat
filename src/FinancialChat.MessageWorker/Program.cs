@@ -3,6 +3,7 @@ using FinancialChat.Application.Interfaces.Gateways;
 using FinancialChat.Application.Interfaces.Services;
 using FinancialChat.Infra.RabbitMQ.Configuration;
 using FinancialChat.Infra.RabbitMQ.Consumers;
+using FinancialChat.Infra.RabbitMQ.Producers;
 using FinancialChat.MessageWorker;
 using Serilog;
 
@@ -29,6 +30,7 @@ try
     builder.Services.Configure<RabbitMQQueueNames>(builder.Configuration.GetSection("RabbitMQQueueNames"));
     builder.Services.AddSingleton<IRabbitMQConnectionFactory, RabbitMQConnectionFactory>();
     builder.Services.AddSingleton<IRabbitMQConsumer, ChatMessageConsumer>();
+    builder.Services.AddScoped<ISendHubMessageProducer, SendHubMessageProducer>();
     builder.Services.AddHostedService<ConsumerWorker>();
 
     var host = builder.Build();

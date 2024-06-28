@@ -20,6 +20,7 @@ const SendMessageForm = ({sendMessage}) => {
               label="Message"
               name="message"
               autoFocus
+              value={message}
               onChange={e => setMessage(e.target.value)}
               placeholder="Type your message"
             />

@@ -1,15 +1,39 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import { LogLevel, HubConnectionBuilder } from '@microsoft/signalr';
 import { useAuth } from "../../Hooks/Login/useAuth";
 import WaitingRoom from "./WaitingRoom";
 import ChatRoom from "./ChatRoom";
 import {Typography, Container} from '@mui/material';
+import BotMessageContainer from "../ChatBot/BotMessageContainer";
 
 function Chat() {
   const { user, token } = useAuth();
   const [messages, setMessages] = useState([]);
+  const [botMessages, setBotMessages] = useState([]);
   const [chatroom, setChatroom] = useState();
   const [connection, setConnection] = useState();
+
+  const sendBotMessage = async(stockTicker) => {
+    try {
+      const response = await fetch("http://localhost:5071/api/Stock?stockTicker="+stockTicker, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        }
+      });
+
+      const res = await response.json();
+      if (res.ok) {
+        console.log("stock request success")
+        return;
+      }
+      
+      throw new Error(res.message);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const joinChatRoom = async (chatRoom) => {
     try{
@@ -26,6 +50,11 @@ function Chat() {
       connBuilder.on("ReceiveSpecificMessage", (username, message) => {
         console.log("Received a new message from username: " + username + " message: " + message);
         setMessages(messages => [...messages, {username, message}]);
+      });
+
+      connBuilder.on("StockBotMessage", (username, message) => {
+        console.log("Received a new bot stock message: " + username + " message: " + message);
+        setBotMessages(botMessages => [...botMessages, {username, message}]);
       });
 
       await connBuilder.start()
@@ -47,7 +76,22 @@ function Chat() {
 
   const sendMessage = async (message) => {
     try {
-      await connection.invoke("SendMessage", message);
+      const regex = /^\/.[a-zA-Z]*/g;
+      if(!message.match(regex)){
+        await connection.invoke("SendMessage", message);
+        return;
+      }
+
+      var stockTicker = message.replace(regex, "")
+        .trim()
+        .toUpperCase();
+
+      if(!stockTicker){
+        console.error("The stocker ticker cannot be null or empty");
+        return;
+      }
+
+      sendBotMessage(stockTicker);
     } catch (e) {
       console.log(e);
     }
@@ -60,6 +104,10 @@ function Chat() {
         ? <WaitingRoom joinChatRoom={joinChatRoom}/>
         : <ChatRoom messages={messages} chatroom={chatroom} sendMessage={sendMessage}/>
       }
+      {connection && 
+      <Container>
+          <BotMessageContainer messages={botMessages}/>
+      </Container>}
     </Container>
   );
 }

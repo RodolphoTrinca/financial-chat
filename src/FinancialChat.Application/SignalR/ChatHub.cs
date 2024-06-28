@@ -10,12 +10,14 @@ namespace FinancialChat.Application.SignalR
         private static Dictionary<string, UserConnection> _usersConnected = new Dictionary<string, UserConnection>();
         private static Dictionary<string, string> _userConnectionId = new Dictionary<string, string>();
 
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
             string name = Context.User.Identity.Name;
             _userConnectionId[name] = Context.ConnectionId;
 
-            return base.OnConnectedAsync();
+            await Groups.AddToGroupAsync(Context.ConnectionId, name);
+
+            await base.OnConnectedAsync();
         }
 
         public async Task JoinSpecificChatRoom(UserConnection connection)
@@ -40,11 +42,13 @@ namespace FinancialChat.Application.SignalR
             await Clients.User(to).SendAsync("ReceiveSpecificMessage", from, message);
         }
 
-        public override Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
             string name = Context.User.Identity.Name;
             _userConnectionId.Remove(name);
-            return base.OnDisconnectedAsync(exception);
+
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, name);
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }

@@ -16,11 +16,12 @@ namespace FinancialChat.Application.Services
             _stockRequest = stockRequestProducer;
         }
 
-        public bool SendMessageWithStockPrice(string stockTicker)
+        public bool SendMessageWithStockPrice(string stockTicker, string user)
         {
             var message = new StockMessageModel()
             {
-                StockTicker = stockTicker
+                StockTicker = stockTicker,
+                Requester = user
             };
 
             return _stockRequest.GetStockPrice(message);

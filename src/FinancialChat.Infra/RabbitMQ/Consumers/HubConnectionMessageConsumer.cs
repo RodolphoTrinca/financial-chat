@@ -11,7 +11,6 @@ using FinancialChat.Application.Entities.MessageModels;
 using FinancialChat.Application.Entities.Chat;
 using FinancialChat.Application.Interfaces.Gateways;
 using Microsoft.AspNetCore.SignalR;
-using FinancialChat.API.Controllers;
 using FinancialChat.Application.SignalR;
 
 namespace FinancialChat.Infra.RabbitMQ.Consumers
@@ -74,7 +73,9 @@ namespace FinancialChat.Infra.RabbitMQ.Consumers
                     using (IServiceScope scope = _scopeFactory.CreateScope())
                     {
                         var hub = scope.ServiceProvider.GetRequiredService<IHubContext<ChatHub>>();
-                        hub.Clients.User(content.To).SendAsync("StockBotMessage", content.From, content.Message);
+                        await hub.Clients.Groups(content.To).SendAsync("StockBotMessage", content.From, content.Message);
+
+                        _logger.LogInformation($"Bot stock message sent to: {content.To}");
                     }
 
                     await Task.CompletedTask;

@@ -1,5 +1,7 @@
-﻿using FinancialChat.Application.Entities.Configuration.RabbitMQ;
+﻿using FinancialChat.Application.Entities.Chat;
+using FinancialChat.Application.Entities.Configuration.RabbitMQ;
 using FinancialChat.Application.Entities.MessageModels;
+using FinancialChat.Application.Entities.StockData;
 using FinancialChat.Application.Interfaces.Gateways;
 using FinancialChat.Application.Interfaces.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -66,18 +68,37 @@ namespace FinancialChat.Infra.RabbitMQ.Consumers
                         throw new NullReferenceException("Error to parse message content");
                     }
 
+                    StockData stockData;
                     //Get Stock price
                     using (IServiceScope scope = _scopeFactory.CreateScope())
                     {
                         var stockService = scope.ServiceProvider.GetRequiredService<IStockService>();
-                        var stockData = await stockService.GetStockPriceAsync(content);
+                        stockData = await stockService.GetStockPriceAsync(content);
 
                         _logger.LogDebug($"Stock data: {stockData}");
+                    }
 
-                        //Post a message into chat queue
-                        if (stockData != null)
+                    //Post a message into chat queue
+                    using (IServiceScope scope = _scopeFactory.CreateScope())
+                    {
+                        var messageData = new MessagesData()
                         {
+                            From = "Stock Bot",
+                            To = content.Requester
+                        };
 
+                        messageData.Message = stockData is null
+                            ? $"We couldn't fetch the price of stock {content.StockTicker}, please try again later"
+                            : $"{stockData.Symbol} quote is ${stockData.Close} per share";
+
+                        var sendHubMessage = scope.ServiceProvider.GetRequiredService<ISendHubMessageProducer>();
+                        var success = sendHubMessage.SendUserMessage(messageData);
+
+                        if (!success)
+                        {
+                            _logger.LogError("Error to send message to user");
+                            await Task.CompletedTask;
+                            return;
                         }
                     }
 

@@ -8,6 +8,7 @@ namespace FinancialChat.Application.Entities.MessageModels
 {
     public class StockMessageModel
     {
-        public string StockTicker { get; set; }
+        public string StockTicker { get; set; } = string.Empty;
+        public string Requester { get; set; } = string.Empty;
     }
 }

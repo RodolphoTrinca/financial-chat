@@ -2,6 +2,6 @@
 {
     public interface IChatCommandService
     {
-        bool SendMessageWithStockPrice(string stockTicker);
+        bool SendMessageWithStockPrice(string stockTicker, string username);
     }
 }
