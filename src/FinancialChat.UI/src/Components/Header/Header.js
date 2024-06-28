@@ -1,14 +1,12 @@
 import React from "react";
-import { Box, AppBar, Toolbar, Typography, IconButton } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import Drawer from "../Drawer/Drawer";
+import { Box, AppBar, Toolbar, Typography, Grid } from "@mui/material";
 import Button from '@mui/material/Button';
 import { useAuth } from "../../Hooks/Login/useAuth";
 import { Link } from "react-router-dom";
 
 const Header = () => {
   const [open, setOpen] = React.useState(false);
-  const { user } = useAuth();
+  const { user, token } = useAuth();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -18,34 +16,32 @@ const Header = () => {
     setOpen(false);
   };
 
+  console.log(user);
+  console.log(token);
   return (
     <div>
       <header>
         <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="static">
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                sx={{ mr: 2, ...(open && { display: "none" }) }}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography variant="h6" noWrap component="div">
-                Financial Chat
-              </Typography>
-              {!user ? (
-                <Button color="inherit" component={Link} to="/login">Login</Button>
-              ) : (
-                <Typography variant="h6" noWrap component="div">
-                  You're logged
-                </Typography>
-              )}
-            </Toolbar>
-          </AppBar>
-          <Drawer open={open} closeDrawer={handleDrawerClose} />
+          <Grid container spacing={2}>
+            <AppBar position="static">
+              <Toolbar>
+                <Grid xs={8}>
+                  <Typography variant="h6" noWrap component="div">
+                    Financial Chat
+                  </Typography>
+                </Grid>
+                <Grid xs={4}>
+                  {!user ? (
+                    <Button variant="contained" color="success" component={Link} to="/login">Login</Button>
+                  ) : (
+                    <Typography variant="h6" noWrap component="div">
+                      Welcome {user}
+                    </Typography>
+                  )}
+                </Grid>
+              </Toolbar>
+            </AppBar>
+          </Grid>
         </Box>
       </header>
     </div>

@@ -37,7 +37,7 @@ namespace FinancialChat.Application.SignalR
             var messages = _chatService.GetChatRoomMessages(connection.ChatRoom);
             foreach (var message in messages)
             {
-                await Clients.Group(connection.ChatRoom).SendAsync("ReceiveSpecificMessage", message.From, message.Message);
+                await Clients.Group(connection.ChatRoom).SendAsync("ReceiveSpecificMessage", message.From, message.Message, message.Created.ToString("MM/dd/yyyy HH:mm"));
             }
 
             await Clients.Group(connection.ChatRoom).SendAsync("JoinSpecificChatRoom", "admin", $"{connection.Username} has joined {connection.ChatRoom}");
@@ -51,13 +51,14 @@ namespace FinancialChat.Application.SignalR
                 {
                     From = connection.Username,
                     To = connection.ChatRoom,
-                    Message = message
+                    Message = message,
+                    Created = DateTime.UtcNow
                 };
 
                 _chatService.SaveMessage(messageData);
 
                 await Clients.Group(connection.ChatRoom)
-                    .SendAsync("ReceiveSpecificMessage", connection.Username, message);
+                    .SendAsync("ReceiveSpecificMessage", connection.Username, message, messageData.Created.ToString("MM/dd/yyyy HH:mm"));
             }
         }
 

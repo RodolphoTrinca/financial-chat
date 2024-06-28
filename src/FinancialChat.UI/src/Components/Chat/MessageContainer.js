@@ -5,7 +5,7 @@ const MessageContainer = ({messages}) => {
         <Container>
             {!messages ? <Typography>There are no messages into this chat room</Typography>
                 : messages.map((message, index) => {
-                return <Typography id={index} key={index}>{message.message} - {message.username}</Typography>
+                    return <Typography id={index} key={index}>{message.message} - {message.username} {message.date && "Sent: " + message.date}</Typography>
                 })
             }
         </Container>

@@ -46,7 +46,7 @@ try
 
     //Configuring services
     builder.Services.Configure<StockPriceConfig>(builder.Configuration.GetSection("StockPriceConfig"));
-    builder.Services.AddScoped<IStockPriceGateway, StockPriceMockedGateway>();
+    builder.Services.AddScoped<IStockPriceGateway, StockPriceGateway>();
     builder.Services.AddScoped<IStockService, StockService>();
     builder.Services.AddScoped<ICSVParseService, CSVParseService>();
     builder.Services.AddScoped<ISendHubMessageProducer, SendHubMessageProducer>();

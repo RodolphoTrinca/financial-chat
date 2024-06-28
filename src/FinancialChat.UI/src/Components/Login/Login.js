@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -8,6 +8,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -31,6 +32,17 @@ const defaultTheme = createTheme();
 
 export default function Login() {
   const { loginAction } = useAuth();
+  const [alert, setAlert] = useState("");
+
+  const callback = (success, message) => {
+    if(!success){
+      setAlert(message.error);
+      setInterval(
+        function(){
+          setAlert("")
+        }, 3000);
+    }
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -39,9 +51,10 @@ export default function Login() {
     formJson.twoFactorCode = "";
     formJson.twoFactorRecoveryCode = "";
 
-    loginAction(formJson);
+    loginAction(formJson, callback);
   };
 
+  console.log(alert);
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -54,6 +67,9 @@ export default function Login() {
             alignItems: 'center',
           }}
         >
+          {alert && (<Alert variant="filled" severity="error">
+            {alert}
+          </Alert>)}
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>

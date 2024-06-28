@@ -42,19 +42,19 @@ function Chat() {
         .configureLogging(LogLevel.Debug)
         .build();
 
-      connBuilder.on("JoinSpecificChatRoom", (username, message) => {
+      connBuilder.on("JoinSpecificChatRoom", (username, message, date) => {
         console.log('Received message JoinSpecificChatRoom from:' + username + " message: " + message);
-        setMessages(messages => [...messages, {username, message}]);
+        setMessages(messages => [...messages, {username, message, date}]);
       });
 
-      connBuilder.on("ReceiveSpecificMessage", (username, message) => {
+      connBuilder.on("ReceiveSpecificMessage", (username, message, date) => {
         console.log("Received a new message from username: " + username + " message: " + message);
-        setMessages(messages => [...messages, {username, message}]);
+        setMessages(messages => [...messages, {username, message, date}]);
       });
 
-      connBuilder.on("StockBotMessage", (username, message) => {
+      connBuilder.on("StockBotMessage", (username, message, date) => {
         console.log("Received a new bot stock message: " + username + " message: " + message);
-        setBotMessages(botMessages => [...botMessages, {username, message}]);
+        setBotMessages(botMessages => [...botMessages, {username, message, date}]);
       });
 
       await connBuilder.start()
