@@ -10,9 +10,9 @@ namespace FinancialChat.API.Controllers
     public class StockController : ControllerBase
     {
         private readonly ILogger<StockController> _logger;
-        private readonly IStockService _service;
+        private readonly IChatCommandService _service;
 
-        public StockController(ILogger<StockController> logger, IStockService service)
+        public StockController(ILogger<StockController> logger, IChatCommandService service)
         {
             _logger = logger;
             _service = service;
@@ -27,7 +27,7 @@ namespace FinancialChat.API.Controllers
             {
                 _logger.LogInformation($"Request to stock price from {stockTicker}");
 
-                var result = _service.GetStockPrice(stockTicker);
+                var result = _service.SendMessageWithStockPrice(stockTicker);
 
                 if (!result)
                 {

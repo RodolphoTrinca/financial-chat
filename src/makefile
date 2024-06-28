@@ -12,10 +12,10 @@ down:
 restart: down startup
 
 tests: 
-	cd ./OpenBanking.Tests && dotnet test
+	cd ./FinancialChat.Tests && dotnet test
 
 deps:
-	cd ./OpenBanking.Tests && docker compose up -d --build 
+	docker compose up rabbitmq db --build 
 
 undeps:
-	cd ./OpenBanking.Tests && docker compose down
+	cd ./FinancialChat.Tests && docker compose down

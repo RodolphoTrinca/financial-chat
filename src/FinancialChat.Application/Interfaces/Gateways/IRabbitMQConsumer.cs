@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FinancialChat.Application.Interfaces.Gateways
 {
-    public interface IStockRequestConsumer
+    public interface IRabbitMQConsumer
     {
         Task ReadMessgaes();
     }

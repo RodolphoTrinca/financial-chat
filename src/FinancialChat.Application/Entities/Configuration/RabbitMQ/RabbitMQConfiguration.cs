@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinancialChat.Infra.RabbitMQ.Configuration
+namespace FinancialChat.Application.Entities.Configuration.RabbitMQ
 {
     public class RabbitMQConfiguration
     {

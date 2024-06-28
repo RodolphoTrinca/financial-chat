@@ -1,4 +1,5 @@
-﻿using FinancialChat.Application.Entities.Configuration.RabbitMQ;
+﻿using FinancialChat.Application.Entities.Chat;
+using FinancialChat.Application.Entities.Configuration.RabbitMQ;
 using FinancialChat.Application.Entities.MessageModels;
 using FinancialChat.Application.Interfaces.Gateways;
 using FinancialChat.Application.Interfaces.Services;
@@ -12,17 +13,17 @@ using System.Text;
 
 namespace FinancialChat.Infra.RabbitMQ.Consumers
 {
-    public class StockRequestConsumer : IRabbitMQConsumer, IDisposable
+    public class ChatMessageConsumer : IRabbitMQConsumer
     {
-        private readonly ILogger<StockRequestConsumer> _logger;
+        private readonly ILogger<ChatMessageConsumer> _logger;
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IConnection _connection;
         private readonly IModel _model;
         private readonly RabbitMQQueueNames _queueNames;
 
-        public StockRequestConsumer(
-            ILogger<StockRequestConsumer> logger, 
-            IRabbitMQConnectionFactory connectionFactory, 
+        public ChatMessageConsumer(
+            ILogger<ChatMessageConsumer> logger,
+            IRabbitMQConnectionFactory connectionFactory,
             IOptions<RabbitMQQueueNames> optionsQueueNames,
             IServiceScopeFactory serviceScopeFactory)
         {
@@ -32,9 +33,9 @@ namespace FinancialChat.Infra.RabbitMQ.Consumers
             _model = _connection.CreateModel();
             _queueNames = optionsQueueNames.Value;
             _model.QueueDeclare(
-                _queueNames.StockPriceRequest, 
-                durable: false, 
-                exclusive: false, 
+                _queueNames.ChatMessages,
+                durable: false,
+                exclusive: false,
                 autoDelete: false);
         }
 
@@ -59,26 +60,34 @@ namespace FinancialChat.Infra.RabbitMQ.Consumers
                         throw new NullReferenceException("Error to parse message model");
                     }
 
-                    var content = JsonConvert.DeserializeObject<StockMessageModel>(messageModel.Content);
+                    var content = JsonConvert.DeserializeObject<MessagesData>(messageModel.Content);
 
                     if (content is null)
                     {
                         throw new NullReferenceException("Error to parse message content");
                     }
 
-                    //Get Stock price
+                    //Save message into database
                     using (IServiceScope scope = _scopeFactory.CreateScope())
                     {
-                        var stockService = scope.ServiceProvider.GetRequiredService<IStockService>();
-                        var stockData = await stockService.GetStockPriceAsync(content);
+                        var chatService = scope.ServiceProvider.GetRequiredService<IChatService>();
+                        chatService.SendMessage(content);
 
-                        _logger.LogDebug($"Stock data: {stockData}");
+                        _logger.LogDebug($"Message saved");
+                    }
 
-                        //Post a message into chat queue
-                        if (stockData != null)
+                    //Send message to client
+                    using (IServiceScope scope = _scopeFactory.CreateScope())
+                    {
+                        var chatService = scope.ServiceProvider.GetRequiredService<ISendHubMessageProducer>();
+                        var success = chatService.SendUserMessage(content);
+
+                        if (!success)
                         {
-
+                            throw new ApplicationException("Error to produce message to publish on hub");
                         }
+
+                        _logger.LogDebug($"Message saved");
                     }
 
                     await Task.CompletedTask;
@@ -91,8 +100,8 @@ namespace FinancialChat.Infra.RabbitMQ.Consumers
                 }
             };
 
-            _logger.LogDebug($"Adding Consumer to queue: {_queueNames.StockPriceRequest}");
-            _model.BasicConsume(_queueNames.StockPriceRequest, false, consumer);
+            _logger.LogDebug($"Adding Consumer to queue: {_queueNames.ChatMessages}");
+            _model.BasicConsume(_queueNames.ChatMessages, false, consumer);
             await Task.CompletedTask;
         }
 

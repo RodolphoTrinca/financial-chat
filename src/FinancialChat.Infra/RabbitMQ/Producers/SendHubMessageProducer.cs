@@ -1,4 +1,5 @@
-﻿using FinancialChat.Application.Entities.Configuration.RabbitMQ;
+﻿using FinancialChat.Application.Entities.Chat;
+using FinancialChat.Application.Entities.Configuration.RabbitMQ;
 using FinancialChat.Application.Entities.MessageModels;
 using FinancialChat.Application.Interfaces.Gateways;
 using FinancialChat.Application.Interfaces.Services;
@@ -10,22 +11,22 @@ using System.Text;
 
 namespace FinancialChat.Infra.RabbitMQ.Producers
 {
-    public class StockRequestProducer : IStockRequestProducer, IDisposable
+    public class SendHubMessageProducer : ISendHubMessageProducer
     {
         private readonly RabbitMQConfiguration _configuration;
         private readonly ILogger<StockRequestProducer> _logger;
         private readonly string _queueName = "messages";
         private readonly IConnection _connection;
 
-        public StockRequestProducer(ILogger<StockRequestProducer> logger, IOptions<RabbitMQConfiguration> optionsConfiguration, IOptions<RabbitMQQueueNames> optionsQueueNames, IRabbitMQConnectionFactory connectionFactory)
+        public SendHubMessageProducer(ILogger<StockRequestProducer> logger, IOptions<RabbitMQConfiguration> optionsConfiguration, IOptions<RabbitMQQueueNames> optionsQueueNames, IRabbitMQConnectionFactory connectionFactory)
         {
             _configuration = optionsConfiguration.Value;
-            _queueName = optionsQueueNames.Value.StockPriceRequest;
+            _queueName = optionsQueueNames.Value.HubConnectionMessages;
             _logger = logger;
             _connection = connectionFactory.CreateChannel();
         }
 
-        public bool GetStockPrice(StockMessageModel messageModel)
+        public bool SendUserMessage(MessagesData messageModel)
         {
             try
             {

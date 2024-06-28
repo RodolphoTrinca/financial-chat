@@ -1,10 +1,13 @@
 using FinancialChat.API.Controllers;
+using FinancialChat.Application.Entities.Configuration.RabbitMQ;
 using FinancialChat.Application.Interfaces.Gateways;
 using FinancialChat.Application.Interfaces.Services;
 using FinancialChat.Application.Services;
 using FinancialChat.Infra.Context;
 using FinancialChat.Infra.RabbitMQ.Configuration;
+using FinancialChat.Infra.RabbitMQ.Consumers;
 using FinancialChat.Infra.RabbitMQ.Producers;
+using FinancialChat.Worker;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -73,6 +76,7 @@ builder.Services.Configure<RabbitMQConfiguration>(builder.Configuration.GetSecti
 builder.Services.Configure<RabbitMQQueueNames>(builder.Configuration.GetSection("RabbitMQQueueNames"));
 builder.Services.AddScoped<IRabbitMQConnectionFactory, RabbitMQConnectionFactory>();
 builder.Services.AddScoped<IStockRequestProducer, StockRequestProducer>();
+builder.Services.AddSingleton<IRabbitMQConsumer, HubConnectionMessageConsumer>();
 
 //Identity configurations
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -85,7 +89,9 @@ builder.Services.AddIdentityApiEndpoints<IdentityUser>()
 builder.Services.AddAuthorization();
 
 //Configuring Services
-builder.Services.AddScoped<IStockService, StockService>();
+builder.Services.AddScoped<IChatCommandService, ChatCommandService>();
+
+builder.Services.AddHostedService<ConsumerWorker>();
 
 var app = builder.Build();
 
@@ -108,7 +114,6 @@ app.UseSwaggerUI(c =>
 });
 
 app.MapHub<ChatHub>("/api/chatHub");
-
 
 app.UseCors(options =>
 {

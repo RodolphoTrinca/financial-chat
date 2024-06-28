@@ -1,4 +1,5 @@
-﻿using FinancialChat.Application.Interfaces.Services;
+﻿using FinancialChat.Application.Entities.Configuration.RabbitMQ;
+using FinancialChat.Application.Interfaces.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
