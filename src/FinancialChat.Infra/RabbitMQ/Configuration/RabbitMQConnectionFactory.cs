@@ -21,9 +21,7 @@ namespace FinancialChat.Infra.RabbitMQ.Configuration
         {
             ConnectionFactory connection = new ConnectionFactory()
             {
-                UserName = _configuration.Username,
-                Password = _configuration.Password,
-                HostName = _configuration.HostName
+                Uri = new Uri($"amqp://{_configuration.Username}:{_configuration.Password}@{_configuration.HostName}:{_configuration.Port}"),
             };
             connection.DispatchConsumersAsync = true;
             var channel = connection.CreateConnection();

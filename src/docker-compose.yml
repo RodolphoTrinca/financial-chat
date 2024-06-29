@@ -16,22 +16,51 @@ services:
     networks:
       - mynetwork
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+        - 5672:5672
+        - 15672:15672
+    volumes:
+        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - mynetwork
+
   financialchat.api.web:
     image: financialchatwebapi
     container_name: financialchat.api.web
     build:
       context: .
       dockerfile: ./FinancialChat.API/Dockerfile
+    restart:
+      always
     depends_on:
       - db
+      - rabbitmq
     ports:
       - "5100:8080"
     networks:
       - mynetwork
 
+  financialchat.chat.commands.worker:
+    image: financialchatchatcommandsworker
+    container_name: financialchat.chat.commands.worker
+    build:
+      context: .
+      dockerfile: ./FinancialChat.ChatCommandsWorker/Dockerfile
+    restart:
+      always
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - mynetwork
+
   financialchat.ui.web:
     image: financialchatuiweb
-    container_name: financialChat.ui.web
+    container_name: financialchat.ui.web
     build:
       context: ./FinancialChat.UI
     ports:
@@ -57,18 +86,6 @@ services:
       - "financialchat.ui.web"
     networks:
       - mynetwork
-
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
-    ports:
-        - 5672:5672
-        - 15672:15672
-    volumes:
-        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-    networks:
-        - mynetwork
 
 volumes:
   db:

@@ -17,5 +17,9 @@ tests:
 deps:
 	docker compose up rabbitmq db --build 
 
+migrate:
+	cd ./FinancialChat.Infra && dotnet ef database update --context MessagesDbContext
+	cd ./FinancialChat.Infra && dotnet ef database update --context FinancialChatContext	
+
 undeps:
 	cd ./FinancialChat.Tests && docker compose down

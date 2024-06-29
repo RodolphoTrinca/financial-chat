@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import {BASE_URL} from "../../Api/financialChat";
 
 export const useRegister = () => {
   const navigate = useNavigate();
 
   const registerAction = async (data) => {
     try {
-      const response = await fetch("http://localhost:5071/api/register", {
+      const response = await fetch(BASE_URL + "/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

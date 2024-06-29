@@ -1,11 +1,12 @@
 import { createContext, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import {BASE_URL} from "../../Api/financialChat";
 
 const AuthContext = createContext({});
 
 const getUserData = async (setUser, navigate) => {
   try {
-    const response = await fetch("http://localhost:5071/api/manage/info", {
+    const response = await fetch(BASE_URL + "/manage/info", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +38,7 @@ export const AuthProvider = ({ children }) => {
       const data = {
         refreshToken: refreshToken
       }
-      const response = await fetch("http://localhost:5071/api/refresh", {
+      const response = await fetch(BASE_URL + "/refresh", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +66,7 @@ export const AuthProvider = ({ children }) => {
 
   const loginAction = async (data, callback) => {
     try {
-      const response = await fetch("http://localhost:5071/api/login", {
+      const response = await fetch(BASE_URL + "/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

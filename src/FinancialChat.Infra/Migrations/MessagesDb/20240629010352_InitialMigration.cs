@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace FinancialChat.Infra.Migrations
+namespace FinancialChat.Infra.Migrations.MessagesDb
 {
     /// <inheritdoc />
     public partial class InitialMigration : Migration

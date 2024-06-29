@@ -5,6 +5,7 @@ import WaitingRoom from "./WaitingRoom";
 import ChatRoom from "./ChatRoom";
 import {Typography, Container} from '@mui/material';
 import BotMessageContainer from "../ChatBot/BotMessageContainer";
+import {BASE_URL} from "../../Api/financialChat";
 
 function Chat() {
   const { user, token } = useAuth();
@@ -15,7 +16,7 @@ function Chat() {
 
   const sendBotMessage = async(stockTicker) => {
     try {
-      const response = await fetch("http://localhost:5071/api/Stock?stockTicker="+stockTicker, {
+      const response = await fetch(BASE_URL + "/Stock?stockTicker="+stockTicker, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +39,7 @@ function Chat() {
   const joinChatRoom = async (chatRoom) => {
     try{
       const connBuilder = new HubConnectionBuilder()
-        .withUrl("http://localhost:5071/api/chatHub", { accessTokenFactory: () => token })
+        .withUrl(BASE_URL + "/chatHub", { accessTokenFactory: () => token })
         .configureLogging(LogLevel.Debug)
         .build();
 

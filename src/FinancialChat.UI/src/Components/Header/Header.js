@@ -25,20 +25,27 @@ const Header = () => {
           <Grid container spacing={2}>
             <AppBar position="static">
               <Toolbar>
-                <Grid xs={8}>
+                <Grid xs>
                   <Typography variant="h6" noWrap component="div">
                     Financial Chat
                   </Typography>
                 </Grid>
-                <Grid xs={4}>
                   {!user ? (
-                    <Button variant="contained" color="success" component={Link} to="/login">Login</Button>
+                  <Grid xs={8}>
+                      <Button variant="contained" color="success" component={Link} to="/login">Login</Button>
+                  </Grid>
                   ) : (
-                    <Typography variant="h6" noWrap component="div">
-                      Welcome {user}
-                    </Typography>
+                    <>
+                      <Grid xs={8}>
+                        <Typography variant="h6" noWrap component="div">
+                          Welcome {user}
+                        </Typography>
+                      </Grid>
+                      <Grid xs={2}>
+                        <Button variant="contained" color="error" component={Link} to="/logout">Logout</Button>
+                      </Grid>
+                    </>
                   )}
-                </Grid>
               </Toolbar>
             </AppBar>
           </Grid>

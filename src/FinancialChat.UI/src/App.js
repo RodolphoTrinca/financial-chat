@@ -7,6 +7,7 @@ import Register from "./Components/Login/Register";
 import { Routes, Route } from "react-router-dom";
 import Chat from "./Components/Chat/Chat";
 import {ProtectedRoute} from "./Routes/ProtectedRoute";
+import Logout from "./Routes/Logout";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         </Route>
         <Route path="/login" element={<Login />} /> 
         <Route path="/register" element={<Register/>}/>
+        <Route path="/logout" element={<Logout/>}/>
       </Routes>
     </AuthProvider>
   );
